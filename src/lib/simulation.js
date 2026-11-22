@@ -505,19 +505,17 @@ export function computeFleetState({ vehicles, lines, assignments, simMinutes, da
       item.elapsed = elapsed;
       item.state = stateFromElapsed({ ...item.info, elapsed, line: item.line, held });
 
-      // Zmęczony autobus dojeżdża do pętli i tam zasypia — stoi do końca kursu.
+      // Zmęczony wóz stoi na pętli końcowej i śpi — nigdy nie jedzie ze statusem snu.
       if (isSleeping(item.vehicle, simMinutes)) {
         const cycle = item.info.cycle;
-        const layoverEnd = cycle.tam.duration + cycle.layover;
-        const stopped =
-          elapsed <= layoverEnd ? Math.min(elapsed, cycle.tam.duration) : Math.min(elapsed, cycle.total);
-        if (stopped !== elapsed) {
-          item.elapsed = stopped;
-          item.state = stateFromElapsed({ ...item.info, elapsed: stopped, line: item.line, held: false });
-        }
+        const loopStop = cycle.tam.stops[cycle.tam.stops.length - 1];
         item.state = {
           ...item.state,
+          lat: loopStop.lat,
+          lng: loopStop.lng,
           phase: "sleep",
+          directionLabel: "SEN",
+          direction: cycle.stops[0].name,
           destination: "ŚPI NA PĘTLI",
           nextStop: "—",
           nextDeparture: null,
