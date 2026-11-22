@@ -120,7 +120,7 @@ export default function FleetTable({
 
                   <Td>
                     {(() => {
-                      const satisfaction = Number(row.vehicle.satisfaction ?? 100);
+                      const satisfaction = Number(row.satisfaction ?? row.vehicle.satisfaction ?? 100);
                       return (
                         <span
                           className={cn(
