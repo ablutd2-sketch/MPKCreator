@@ -8,10 +8,11 @@ const OSRM_PROVIDERS = [
   "https://routing.openstreetmap.de/routed-car/route/v1/driving/",
 ];
 
-async function requestRoute(base, coords) {
-  const response = await fetch(`${base}${coords}?overview=full&geometries=geojson&continue_straight=false`, {
-    headers: { Accept: "application/json" },
-  });
+async function requestRoute(base, coords, continueStraight) {
+  const response = await fetch(
+    `${base}${coords}?overview=full&geometries=geojson&continue_straight=${continueStraight === true}`,
+    { headers: { Accept: "application/json" } }
+  );
   if (!response.ok) throw new Error(`OSRM ${response.status}`);
 
   const payload = await response.json();
@@ -23,14 +24,14 @@ async function requestRoute(base, coords) {
 }
 
 export const getRoadPath = createServerFn({ method: "POST" })
-  .validator(z.object({ points: z.array(PointSchema).min(2).max(60) }))
+  .validator(z.object({ points: z.array(PointSchema).min(2).max(60), continueStraight: z.boolean().optional() }))
   .handler(async ({ data }) => {
     const coords = data.points.map((point) => `${point.lng.toFixed(6)},${point.lat.toFixed(6)}`).join(";");
 
     let lastError = null;
     for (const base of OSRM_PROVIDERS) {
       try {
-        return await requestRoute(base, coords);
+        return await requestRoute(base, coords, data.continueStraight);
       } catch (error) {
         lastError = error;
       }
