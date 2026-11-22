@@ -21,6 +21,7 @@ function toDraft(line) {
     name: line.name || "",
     color: line.color || "#C8102E",
     night: Boolean(line.night) || isNightNumber(line.number),
+    tram: Boolean(line.tram),
     stops: Array.isArray(line.stops) ? line.stops.map((stop) => ({ ...stop })) : [],
     path_tam: Array.isArray(line.path_tam) ? line.path_tam : [],
     path_powrot: Array.isArray(line.path_powrot) ? line.path_powrot : [],
@@ -91,7 +92,7 @@ function RoutesPage() {
       toast.error("Podaj numer linii.");
       return;
     }
-    if (draft.stops.length >= 2 && (!(draft.path_tam || []).length || !(draft.path_powrot || []).length)) {
+    if (!draft.tram && draft.stops.length >= 2 && (!(draft.path_tam || []).length || !(draft.path_powrot || []).length)) {
       toast.error("Najpierw wyznacz trasę po drogach.");
       return;
     }
@@ -103,6 +104,7 @@ function RoutesPage() {
         name: autoLineName(draft.stops),
         color: draft.color,
         night: Boolean(draft.night),
+        tram: Boolean(draft.tram),
         stops: draft.stops.map((stop) => ({
           name: String(stop.name || "").trim() || "Przystanek",
           lat: Number(stop.lat),
