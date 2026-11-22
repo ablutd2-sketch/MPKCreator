@@ -1,0 +1,89 @@
+{
+  "name": "Assignment",
+  "type": "object",
+  "properties": {
+    "vehicle_id": {
+      "type": "string",
+      "description": "Identyfikator pojazdu; puste przy automatycznym przydziale taboru"
+    },
+    "line_id": {
+      "type": "string",
+      "description": "Identyfikator linii"
+    },
+    "brigade": {
+      "type": "string",
+      "description": "Brygada / numer kursu, np. 101-01"
+    },
+    "mon": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Godziny odjazd\u00f3w w poniedzia\u0142ek"
+    },
+    "tue": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Godziny odjazd\u00f3w we wtorek"
+    },
+    "wed": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Godziny odjazd\u00f3w w \u015brod\u0119"
+    },
+    "thu": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Godziny odjazd\u00f3w w czwartek"
+    },
+    "fri": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Godziny odjazd\u00f3w w pi\u0105tek"
+    },
+    "sat": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Godziny odjazd\u00f3w w sobot\u0119"
+    },
+    "sun": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Godziny odjazd\u00f3w w niedziel\u0119"
+    }
+  },
+  "required": [
+    "line_id",
+    "brigade"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
