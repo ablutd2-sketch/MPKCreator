@@ -95,6 +95,15 @@ export function isCircuitStops(rawStops) {
   return distanceKm(stops[0], stops[stops.length - 1]) < 0.2;
 }
 
+/** Przystanek zawracania: najdalszy od początku punkt trasy (bez powrotu do startu). */
+function turnaroundStop(path) {
+  let best = null;
+  for (let i = 0; i < path.stopDist.length - 1; i += 1) {
+    if (!best || path.stopDist[i] > best.dist) best = { dist: path.stopDist[i], stop: path.stops[i] };
+  }
+  return best?.stop || path.stops[path.stops.length - 1];
+}
+
 function normalizeGeometry(geometry) {
   if (!Array.isArray(geometry)) return [];
   return geometry
@@ -246,6 +255,7 @@ export function buildCycle(line) {
     powrot,
     layover,
     circuit,
+    turnaround: circuit ? turnaroundStop(tam) : null,
     total: tam.duration + layover + powrot.duration,
   };
 
@@ -272,7 +282,13 @@ function buildState(phase, path, position, cycle, departures, nowSec, line) {
 
   const first = cycle.stops[0];
   const finish = cycle.stops[cycle.stops.length - 1];
-  const direction = phase === "tam" ? `${first.name} → ${finish.name}` : `${finish.name} → ${first.name}`;
+  const turnaround = cycle.turnaround;
+  const direction =
+    cycle.circuit && turnaround
+      ? `${first.name} – ${turnaround.name}`
+      : phase === "tam"
+        ? `${first.name} → ${finish.name}`
+        : `${finish.name} → ${first.name}`;
 
   return {
     lat: position.lat,
@@ -280,7 +296,7 @@ function buildState(phase, path, position, cycle, departures, nowSec, line) {
     phase,
     directionLabel: cycle.circuit ? "KURS" : phase === "tam" ? "TAM" : "POWRÓT",
     direction,
-    destination: last.name,
+    destination: cycle.circuit && turnaround ? turnaround.name : last.name,
     nextStop: `${next.name} ${phase === "tam" ? next.pole : next.pole_back}`,
     nextDeparture: nextDeparture ?? null,
     lineColor: line?.color || "#14223B",
