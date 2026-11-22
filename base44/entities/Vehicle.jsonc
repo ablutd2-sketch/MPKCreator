@@ -6,6 +6,19 @@
       "type": "string",
       "description": "Numer taborowy pojazdu, np. BUS01"
     },
+    "kind": {
+      "type": "string",
+      "description": "Rodzaj pojazdu: autobus albo tramwaj",
+      "enum": [
+        "bus",
+        "tram"
+      ],
+      "enumColors": [
+        "blue",
+        "gray"
+      ],
+      "default": "bus"
+    },
     "model": {
       "type": "string",
       "description": "Model pojazdu, np. Solaris Urbino 18"
@@ -16,17 +29,17 @@
     },
     "satisfaction": {
       "type": "number",
-      "description": "Zadowolenie autobusu w procentach. Poni\u017cej 40% autobus mo\u017ce uciec z trasy \u2014 im ni\u017cej, tym wi\u0119ksza szansa.",
+      "description": "Zadowolenie pojazdu w procentach. Spada samo w ci\u0105gu dnia; poni\u017cej 40% pojazd mo\u017ce uciec z trasy.",
       "default": 100
     },
     "fatigue": {
       "type": "number",
-      "description": "Zm\u0119czenie autobusu w procentach. Ro\u015bnie w ci\u0105gu dnia; od 80% autobus zasypia na p\u0119tli i stoi do czasu wys\u0142ania do SPA.",
+      "description": "Zm\u0119czenie pojazdu w procentach. Ro\u015bnie samo w ci\u0105gu dnia; od 80% zasypia na p\u0119tli do czasu u\u0142o\u017cenia go do spania w zajezdni.",
       "default": 0
     },
-    "spa": {
+    "depot_sleep": {
       "type": "boolean",
-      "description": "Autobus odes\u0142any do spa w zajezdni \u2014 stoi, odpoczywa i ma status \u015aPI.",
+      "description": "Pojazd u\u0142o\u017cony do spania w zajezdni \u2014 stoi, odpoczywa i ma status \u015aPI.",
       "default": false
     }
   },
