@@ -1,4 +1,4 @@
-import { ArrowRight, Bus } from "lucide-react";
+import { Bus } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import LineBadge from "@/components/LineBadge";
 
@@ -19,9 +19,9 @@ export default function ActiveVehiclesPanel({ items = [], onSelect }) {
               onClick={() => onSelect?.(item)}
               className="flex w-full items-center gap-2.5 px-3 py-2 text-left transition-colors hover:bg-secondary/70"
             >
-              <span className="h-8 w-8 shrink-0 overflow-hidden rounded-lg bg-primary">
+              <span className="h-7 w-10 shrink-0 overflow-hidden rounded-lg bg-primary">
                 {item.vehicle.image_url ? (
-                  <Image src={item.vehicle.image_url} alt="" className="h-8 w-8 rounded-[3px] bg-white" fittingType="fit" />
+                  <Image src={item.vehicle.image_url} alt="" className="h-7 w-10 bg-white object-contain" fittingType="fit" />
                 ) : (
                   <span className="flex h-full w-full items-center justify-center">
                     <Bus className="h-4 w-4 text-white/70" strokeWidth={1.6} />
@@ -36,8 +36,7 @@ export default function ActiveVehiclesPanel({ items = [], onSelect }) {
                   </span>
                 </span>
                 <span className="mt-0.5 flex items-center gap-1 truncate text-[11px] text-muted-foreground">
-                  <ArrowRight className="h-3 w-3 shrink-0" />
-                  <span className="truncate">{item.state.destination}</span>
+                  <span className="truncate">{item.state.direction || item.state.destination}</span>
                 </span>
               </span>
             </button>
