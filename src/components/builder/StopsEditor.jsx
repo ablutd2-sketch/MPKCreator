@@ -256,6 +256,7 @@ export default function StopsEditor({ draft, onChange, onSave, saving, vehicles 
                 fitKey={draft.id}
                 stops={stops}
                 color={draft.color}
+                tram={Boolean(draft.tram)}
                 pathTam={draft.path_tam}
                 pathPowrot={draft.path_powrot}
                 onAdd={addStop}
@@ -314,6 +315,18 @@ export default function StopsEditor({ draft, onChange, onSave, saving, vehicles 
               )}
             >
               Linia nocna
+            </button>
+            <button
+              type="button"
+              onClick={() => patch({ tram: !draft.tram })}
+              className={cn(
+                "rounded-lg border px-2 py-1 text-[10px] font-semibold transition-colors",
+                draft.tram
+                  ? "border-slate-500 bg-slate-500 text-white"
+                  : "border-border bg-card text-muted-foreground hover:text-foreground"
+              )}
+            >
+              Tramwaj
             </button>
             <input
               type="color"
