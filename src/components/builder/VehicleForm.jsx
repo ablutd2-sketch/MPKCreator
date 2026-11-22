@@ -4,10 +4,12 @@ import { toast } from "sonner";
 import { base44 } from "@/api/base44Client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 
 export default function VehicleForm({ onSaved }) {
   const [fleetNumber, setFleetNumber] = useState("");
   const [model, setModel] = useState("");
+  const [satisfaction, setSatisfaction] = useState(100);
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState("");
   const [saving, setSaving] = useState(false);
@@ -29,6 +31,7 @@ export default function VehicleForm({ onSaved }) {
   const reset = () => {
     setFleetNumber("");
     setModel("");
+    setSatisfaction(100);
     setFile(null);
     setPreview("");
     if (fileRef.current) fileRef.current.value = "";
@@ -54,6 +57,7 @@ export default function VehicleForm({ onSaved }) {
         fleet_number: number,
         model: model.trim(),
         image_url: imageUrl,
+        satisfaction,
       });
       toast.success("Pojazd dodany do taboru");
       reset();
@@ -95,6 +99,35 @@ export default function VehicleForm({ onSaved }) {
             placeholder="np. Solaris Urbino 18"
             className="mt-1 h-10 text-[13px]"
           />
+        </div>
+
+        <div>
+          <Label htmlFor="satisfaction" className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
+            Zadowolenie autobusu
+          </Label>
+          <div className="mt-1 flex items-center gap-2">
+            <input
+              id="satisfaction"
+              type="range"
+              min="0"
+              max="100"
+              step="1"
+              value={satisfaction}
+              onChange={(event) => setSatisfaction(Number(event.target.value))}
+              className="h-1.5 flex-1 cursor-pointer appearance-none rounded-full bg-secondary accent-black"
+            />
+            <span
+              className={cn(
+                "num w-10 text-right text-[12px] font-semibold",
+                satisfaction < 40 ? "text-destructive" : "text-foreground"
+              )}
+            >
+              {satisfaction}%
+            </span>
+          </div>
+          <p className="mt-1 text-[10px] leading-snug text-muted-foreground">
+            Poniżej 40% autobus może uciec z trasy — im niżej, tym większa szansa.
+          </p>
         </div>
 
         <div>
