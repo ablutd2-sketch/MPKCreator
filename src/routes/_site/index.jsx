@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import MapControls from "@/components/map/MapControls";
 import ActiveVehiclesPanel from "@/components/map/ActiveVehiclesPanel";
 import OffRouteAlarm from "@/components/map/OffRouteAlarm";
+import BusCarePanel from "@/components/map/BusCarePanel";
 import { useSimulation } from "@/lib/SimulationContext";
 import { buildLiveItems } from "@/lib/livePositions";
 import { applyEscapes } from "@/lib/escape";
@@ -141,6 +142,8 @@ function LiveMapPage() {
       {shown.length > 0 && (
         <ActiveVehiclesPanel items={shown} onSelect={(item) => setFocus({ lat: item.state.lat, lng: item.state.lng })} />
       )}
+
+      {sim.mode === "sim" && shown.length > 0 && <BusCarePanel items={shown} />}
 
       {!loading && vehicles.length === 0 && <EmptyHint />}
     </div>
