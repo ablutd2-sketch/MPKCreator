@@ -1,3 +1,5 @@
+import { effectiveFatigue, effectiveSatisfaction, isSleeping } from "@/lib/fatigue";
+
 export const BUS_SPEED_KMH = 24;
 export const DWELL_SEC = 30;
 export const LAYOVER_SEC = 120;
@@ -478,11 +480,59 @@ export function computeFleetState({ vehicles, lines, assignments, simMinutes, da
       }
       item.elapsed = elapsed;
       item.state = stateFromElapsed({ ...item.info, elapsed, line: item.line, held });
+
+      // Zmęczony autobus dojeżdża do pętli i tam zasypia — stoi do końca kursu.
+      if (isSleeping(item.vehicle, simMinutes)) {
+        const cycle = item.info.cycle;
+        const layoverEnd = cycle.tam.duration + cycle.layover;
+        const stopped =
+          elapsed <= layoverEnd ? Math.min(elapsed, cycle.tam.duration) : Math.min(elapsed, cycle.total);
+        if (stopped !== elapsed) {
+          item.elapsed = stopped;
+          item.state = stateFromElapsed({ ...item.info, elapsed: stopped, line: item.line, held: false });
+        }
+        item.state = {
+          ...item.state,
+          phase: "sleep",
+          destination: "ŚPI NA PĘTLI",
+          nextStop: "—",
+          nextDeparture: null,
+        };
+        item.sleeping = true;
+      }
+
       previous = item;
     });
   });
 
-  return items.map(({ vehicle, assignment, line, state }) => ({ vehicle, assignment, line, state }));
+  // Ułożony do spania w zajezdni: autobus stoi na pętli startowej i odpoczywa.
+  items.forEach((item) => {
+    if (!item.vehicle?.depot_sleep || !item.line) return;
+    const stop = normalizeStops(item.line.stops)[0];
+    if (!stop) return;
+    item.state = {
+      lat: stop.lat,
+      lng: stop.lng,
+      phase: "spa",
+      directionLabel: "SEN",
+      direction: "Zajezdnia",
+      destination: "ŚPI W ZAJEDNI",
+      nextStop: "—",
+      nextDeparture: null,
+      lineColor: item.line.color || "#14223B",
+    };
+    item.sleeping = true;
+  });
+
+  return items.map(({ vehicle, assignment, line, state, sleeping }) => ({
+    vehicle,
+    assignment,
+    line,
+    state,
+    fatigue: effectiveFatigue(vehicle, simMinutes),
+    satisfaction: effectiveSatisfaction(vehicle, simMinutes),
+    sleeping: Boolean(sleeping),
+  }));
 }
 
 export function lastActivity({ assignment, line, dayKey, simMinutes }) {
