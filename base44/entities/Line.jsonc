@@ -18,6 +18,11 @@
       "type": "boolean",
       "description": "Linia nocna (czarny prostok\u0105t z bia\u0142ym numerem)"
     },
+    "tram": {
+      "type": "boolean",
+      "description": "Linia tramwajowa \u2014 torowisko rysowane jest szar\u0105, przerywan\u0105 lini\u0105 z g\u0142adkimi \u0142ukami",
+      "default": false
+    },
     "stops": {
       "type": "array",
       "description": "Przystanki w kolejno\u015bci przejazdu, ka\u017cdy z numerem s\u0142upka TAM i POWR\u00d3T",
@@ -53,7 +58,7 @@
           },
           "petla": {
             "type": "boolean",
-            "description": "Przystanek jest p\u0119tl\u0105 \u2014 autobus stoi tu d\u0142u\u017cej (post\u00f3j linii, np. 5 min) zamiast 30 s"
+            "description": "Przystanek jest p\u0119tl\u0105 \u2014 pojazd stoi tu d\u0142u\u017cej (post\u00f3j linii, np. 5 min) zamiast 30 s"
           }
         }
       }
