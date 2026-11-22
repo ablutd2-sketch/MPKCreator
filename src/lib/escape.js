@@ -29,19 +29,21 @@ export function applyEscapes(items, { simMinutes = 0 } = {}) {
   const day = Math.floor(Number(simMinutes || 0) / 1440);
 
   return (items || []).map((item) => {
-    const chance = escapeChance(item.vehicle?.satisfaction);
+    if (item.sleeping || item.vehicle?.depot_sleep) return item;
+    const chance = escapeChance(item.satisfaction ?? item.vehicle?.satisfaction);
     if (chance <= 0) return item;
     if (roll(`${item.vehicle.id}:${day}`) >= chance) return item;
 
     const city = CITIES[Math.floor(roll(`${item.vehicle.id}:city`) * CITIES.length) % CITIES.length];
 
+    // Pozycja zostaje na trasie — autobus dojedzie do miasta po drogach,
+    // a nie przeskoczy na mapie.
     return {
       ...item,
       escaped: true,
+      escape: { city },
       state: {
         ...item.state,
-        lat: city.lat,
-        lng: city.lng,
         phase: "escaped",
         destination: `UCIECZKA · ${city.name}`,
       },
