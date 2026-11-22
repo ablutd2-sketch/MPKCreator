@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 
 export default function VehicleForm({ onSaved }) {
   const [fleetNumber, setFleetNumber] = useState("");
+  const [kind, setKind] = useState("bus");
   const [model, setModel] = useState("");
   const [satisfaction, setSatisfaction] = useState(100);
   const [file, setFile] = useState(null);
@@ -30,6 +31,7 @@ export default function VehicleForm({ onSaved }) {
 
   const reset = () => {
     setFleetNumber("");
+    setKind("bus");
     setModel("");
     setSatisfaction(100);
     setFile(null);
@@ -55,6 +57,7 @@ export default function VehicleForm({ onSaved }) {
       }
       await base44.entities.Vehicle.create({
         fleet_number: number,
+        kind,
         model: model.trim(),
         image_url: imageUrl,
         satisfaction,
@@ -72,7 +75,28 @@ export default function VehicleForm({ onSaved }) {
   return (
     <form onSubmit={submit} className="surface p-5">
       <p className="eyebrow">Nowy pojazd</p>
-      <h2 className="mt-1.5 font-display text-2xl leading-none">Dodaj autobus</h2>
+      <h2 className="mt-1.5 font-display text-2xl leading-none">Dodaj pojazd</h2>
+
+      <div className="mt-3 flex gap-1.5">
+        {[
+          { value: "bus", label: "Autobus" },
+          { value: "tram", label: "Tramwaj" },
+        ].map((option) => (
+          <button
+            key={option.value}
+            type="button"
+            onClick={() => setKind(option.value)}
+            className={cn(
+              "flex h-8 flex-1 items-center justify-center rounded-lg border text-[11.5px] font-semibold transition-colors",
+              kind === option.value
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-border bg-card text-muted-foreground hover:text-foreground"
+            )}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
 
       <div className="mt-4 space-y-3">
         <div>
@@ -103,7 +127,7 @@ export default function VehicleForm({ onSaved }) {
 
         <div>
           <Label htmlFor="satisfaction" className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
-            Zadowolenie autobusu
+            Zadowolenie pojazdu
           </Label>
           <div className="mt-1 flex items-center gap-2">
             <input
