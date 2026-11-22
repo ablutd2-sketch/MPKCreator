@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Apple, Bed, Droplets, Loader2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
-import { FATIGUE_LIMIT } from "@/lib/fatigue";
+import { FATIGUE_LIMIT, wakeFatigueValue } from "@/lib/fatigue";
+import { useSimulation } from "@/lib/SimulationContext";
 import { useTransitData } from "@/lib/useTransitData";
 import { cn } from "@/lib/utils";
 
@@ -20,6 +21,7 @@ function rollGain(max) {
 const satisfactionOf = (item) => Math.round(Number(item?.satisfaction ?? item?.vehicle?.satisfaction ?? 100));
 
 export default function BusCarePanel({ items = [] }) {
+  const { simMinutes } = useSimulation();
   const { reload } = useTransitData();
   const [selected, setSelected] = useState("");
   const [result, setResult] = useState(null);
@@ -62,7 +64,7 @@ export default function BusCarePanel({ items = [] }) {
     try {
       await base44.entities.Vehicle.update(
         current.vehicle.id,
-        next ? { depot_sleep: true, fatigue: 0 } : { depot_sleep: false, fatigue: 0 }
+        next ? { depot_sleep: true, fatigue: 0 } : { depot_sleep: false, fatigue: wakeFatigueValue(current.vehicle, simMinutes) }
       );
       setResult(null);
       await reload();
