@@ -27,3 +27,14 @@ export function isSleeping(vehicle, simMinutes) {
   if (vehicle?.depot_sleep) return false;
   return effectiveFatigue(vehicle, simMinutes) >= FATIGUE_LIMIT;
 }
+
+export const SATISFACTION_PER_HOUR = 1.2;
+
+/** Zadowolenie spada samo z każdą godziną dnia; w zajezdni pojazd odpoczywa i wraca do 100%. */
+export function effectiveSatisfaction(vehicle, simMinutes) {
+  if (vehicle?.depot_sleep) return 100;
+  const base = Number(vehicle?.satisfaction ?? 100);
+  const minutes = ((Number(simMinutes || 0) % 1440) + 1440) % 1440;
+  const value = base - (minutes / 60) * SATISFACTION_PER_HOUR;
+  return Math.max(0, Math.min(100, Math.round(value * 10) / 10));
+}
