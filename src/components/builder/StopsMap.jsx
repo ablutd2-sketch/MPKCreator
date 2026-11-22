@@ -6,6 +6,7 @@ import { stopIcon } from "@/lib/busIcon";
 import BaseTileLayer from "@/components/map/BaseTileLayer";
 import MapSearch from "@/components/map/MapSearch";
 import { POLAND_CENTER, POLAND_ZOOM } from "@/lib/mapConfig";
+import { TRAM_COLOR, trackPositions } from "@/lib/track";
 
 function ClickHandler({ onAdd, onPlaceBack, placingBack, onPlaceVia, placingVia }) {
   useMapEvents({
@@ -56,6 +57,7 @@ function MapViewport({ fitKey, stops }) {
 export default function StopsMap({
   stops = [],
   color = "#C8102E",
+  tram = false,
   pathTam = [],
   pathPowrot = [],
   onAdd,
@@ -94,16 +96,23 @@ export default function StopsMap({
       ))}
 
       <Polyline
-        positions={hasTam ? pathTam.map((point) => [point.lat, point.lng]) : stops.map((stop) => [Number(stop.lat), Number(stop.lng)])}
-        pathOptions={{
-          color,
-          weight: hasTam ? 5 : 4,
-          opacity: hasTam ? 0.75 : 0.45,
-          lineCap: "round",
-          dashArray: hasTam ? undefined : "6 8",
-        }}
+        positions={trackPositions(
+          hasTam ? pathTam : stops.map((stop) => ({ lat: Number(stop.lat), lng: Number(stop.lng) })),
+          tram
+        )}
+        pathOptions={
+          tram
+            ? { color: TRAM_COLOR, weight: 3, opacity: 0.9, dashArray: "10 8", lineCap: "round" }
+            : {
+                color,
+                weight: hasTam ? 5 : 4,
+                opacity: hasTam ? 0.75 : 0.45,
+                lineCap: "round",
+                dashArray: hasTam ? undefined : "6 8",
+              }
+        }
       />
-      {hasPowrot && (
+      {hasPowrot && !tram && (
         <Polyline
           positions={pathPowrot.map((point) => [point.lat, point.lng])}
           pathOptions={{ color, weight: 3, opacity: 0.4, dashArray: "3 7", lineCap: "round" }}
