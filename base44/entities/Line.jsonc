@@ -1,0 +1,173 @@
+{
+  "name": "Line",
+  "type": "object",
+  "properties": {
+    "number": {
+      "type": "string",
+      "description": "Numer linii, np. 101"
+    },
+    "name": {
+      "type": "string",
+      "description": "Kierunek generowany automatycznie: przystanek pocz\u0105tkowy \u2192 przystanek ko\u0144cowy"
+    },
+    "color": {
+      "type": "string",
+      "description": "Kolor linii w formacie HEX"
+    },
+    "night": {
+      "type": "boolean",
+      "description": "Linia nocna (czarny prostok\u0105t z bia\u0142ym numerem)"
+    },
+    "stops": {
+      "type": "array",
+      "description": "Przystanki w kolejno\u015bci przejazdu, ka\u017cdy z numerem s\u0142upka TAM i POWR\u00d3T",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "lat": {
+            "type": "number",
+            "description": "Szeroko\u015b\u0107 geograficzna s\u0142upka TAM"
+          },
+          "lng": {
+            "type": "number",
+            "description": "D\u0142ugo\u015b\u0107 geograficzna s\u0142upka TAM"
+          },
+          "pole": {
+            "type": "string",
+            "description": "Numer s\u0142upka w kierunku TAM, np. 01"
+          },
+          "lat_back": {
+            "type": "number",
+            "description": "Szeroko\u015b\u0107 geograficzna s\u0142upka POWR\u00d3T"
+          },
+          "lng_back": {
+            "type": "number",
+            "description": "D\u0142ugo\u015b\u0107 geograficzna s\u0142upka POWR\u00d3T"
+          },
+          "pole_back": {
+            "type": "string",
+            "description": "Numer s\u0142upka w kierunku POWR\u00d3T, np. 02"
+          },
+          "petla": {
+            "type": "boolean",
+            "description": "Przystanek jest p\u0119tl\u0105 \u2014 autobus stoi tu d\u0142u\u017cej (post\u00f3j linii, np. 5 min) zamiast 30 s"
+          }
+        }
+      }
+    },
+    "path_tam": {
+      "type": "array",
+      "description": "Geometria trasy TAM wyznaczona po drogach (OSRM)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "lat": {
+            "type": "number"
+          },
+          "lng": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "path_powrot": {
+      "type": "array",
+      "description": "Geometria trasy POWR\u00d3T wyznaczona po drogach (OSRM)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "lat": {
+            "type": "number"
+          },
+          "lng": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "via_petla": {
+      "type": "array",
+      "description": "Punkty prowadzenia na p\u0119tli \u2014 trasa przechodzi przez nie przed zawr\u00f3ceniem, wymuszaj\u0105c kierunek wjazdu",
+      "items": {
+        "type": "object",
+        "properties": {
+          "lat": {
+            "type": "number"
+          },
+          "lng": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "assignment_mode": {
+      "type": "string",
+      "description": "Tryb przydzia\u0142u taboru: r\u0119czny, wybrany model lub udzia\u0142y procentowe",
+      "enum": [
+        "manual",
+        "model",
+        "percentage"
+      ],
+      "enumColors": [
+        "blue",
+        "purple",
+        "green"
+      ],
+      "default": "manual"
+    },
+    "model_filter": {
+      "type": "string",
+      "description": "Model lub marka dopuszczona na linii w trybie model"
+    },
+    "model_mix": {
+      "type": "array",
+      "description": "Udzia\u0142y procentowe modeli w trybie percentage",
+      "items": {
+        "type": "object",
+        "properties": {
+          "model": {
+            "type": "string"
+          },
+          "percent": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "manual_vehicles": {
+      "type": "array",
+      "description": "Wozy wybrane r\u0119cznie do obs\u0142ugi brygad tej linii (identyfikatory pojazd\u00f3w w kolejno\u015bci)",
+      "items": {
+        "type": "string"
+      }
+    },
+    "layover_min": {
+      "type": "number",
+      "description": "Post\u00f3j na p\u0119tli ko\u0144cowej w minutach, u\u017cywany przez generator taktu i symulacj\u0119"
+    }
+  },
+  "required": [
+    "number"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
