@@ -97,11 +97,11 @@ export function isCircuitStops(rawStops) {
 
 /** Przystanek zawracania: najdalszy od początku punkt trasy (bez powrotu do startu). */
 function turnaroundStop(path) {
-  let best = null;
-  for (let i = 0; i < path.stopDist.length - 1; i += 1) {
-    if (!best || path.stopDist[i] > best.dist) best = { dist: path.stopDist[i], stop: path.stops[i] };
+  const names = path.stops.map((stop) => String(stop.name).trim());
+  for (let i = 1; i < names.length; i += 1) {
+    if (names[i] && names.slice(0, i).includes(names[i])) return path.stops[i - 1];
   }
-  return best?.stop || path.stops[path.stops.length - 1];
+  return path.stops[path.stops.length - 1];
 }
 
 function normalizeGeometry(geometry) {
@@ -244,9 +244,17 @@ export function buildCycle(line) {
 
   const circuit = isCircuitStops(line.stops);
   const tam = buildPath(line.stops, line.path_tam, "tam", layover);
+  // Tramwaj jedzie tym samym torem w obie strony — gdy nie ma osobnej trasy
+  // powrotnej, wystarczy odwrócić narysowany tor.
+  const trackOnly =
+    !circuit &&
+    (line.path_tam || []).length > 1 &&
+    (line.path_powrot || []).length < 2;
   const powrot = circuit
     ? buildPath(line.stops, line.path_tam, "tam", layover)
-    : buildPath(line.stops, line.path_powrot, "powrot", layover);
+    : trackOnly
+      ? buildPath(line.stops, [...line.path_tam].reverse(), "powrot", layover)
+      : buildPath(line.stops, line.path_powrot, "powrot", layover);
   if (!tam || !powrot) return null;
 
   const cycle = {
