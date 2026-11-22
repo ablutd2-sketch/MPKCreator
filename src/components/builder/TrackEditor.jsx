@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useMemo, useState } from "react";
+import { Suspense, lazy, useEffect, useMemo, useRef, useState } from "react";
 import { ClientOnly } from "@tanstack/react-router";
 import { Loader2, Save, Trash2, Undo2 } from "lucide-react";
 import { toast } from "sonner";
@@ -14,6 +14,7 @@ export default function TrackEditor() {
   const [lineId, setLineId] = useState("");
   const [points, setPoints] = useState([]);
   const [saving, setSaving] = useState(false);
+  const skipSave = useRef(true);
 
   const tramLines = useMemo(() => lines.filter((item) => item.tram), [lines]);
   const line = useMemo(() => tramLines.find((item) => item.id === lineId) || null, [tramLines, lineId]);
@@ -29,12 +30,33 @@ export default function TrackEditor() {
   }, [tramLines, lineId]);
 
   useEffect(() => {
+    skipSave.current = true;
     setPoints(
       Array.isArray(line?.path_tam)
         ? line.path_tam.map((point) => ({ lat: Number(point.lat), lng: Number(point.lng) }))
         : []
     );
   }, [line?.id]);
+
+  // Tor zapisuje się sam po każdym kliknięciu, żeby symulacja od razu jechała po nim.
+  useEffect(() => {
+    if (skipSave.current) {
+      skipSave.current = false;
+      return undefined;
+    }
+    if (!line || points.length < 2) return undefined;
+
+    const timer = setTimeout(async () => {
+      try {
+        await base44.entities.Line.update(line.id, { tram: true, path_tam: points, path_powrot: [] });
+        await reload();
+      } catch {
+        toast.error("Nie udało się zapisać toru.");
+      }
+    }, 700);
+
+    return () => clearTimeout(timer);
+  }, [points]);
 
   const addPoint = (lat, lng) =>
     setPoints((current) => [...current, { lat: Number(lat.toFixed(6)), lng: Number(lng.toFixed(6)) }]);
@@ -148,8 +170,8 @@ export default function TrackEditor() {
           </button>
 
           <p className="mt-2 text-[10.5px] leading-relaxed text-muted-foreground">
-            Zapis oznacza linię jako tramwajową i czyści trasę powrotną — tramwaj jedzie tym samym torem w obie
-            strony.
+            Tor zapisuje się sam po każdym kliknięciu. Linia staje się tramwajowa, a trasę powrotną tworzy ten sam
+            tor w drugą stronę.
           </p>
         </div>
       </div>
