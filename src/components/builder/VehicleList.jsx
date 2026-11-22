@@ -1,10 +1,26 @@
+import { useState } from "react";
 import { Bus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { base44 } from "@/api/base44Client";
 import { Image } from "@/components/ui/image";
 import LineBadge from "@/components/LineBadge";
+import { cn } from "@/lib/utils";
 
 export default function VehicleList({ vehicles, lines = [], assignments = [], loading, onChanged }) {
+  const [draft, setDraft] = useState({});
+
+  const saveSatisfaction = async (vehicle, raw) => {
+    const value = Math.max(0, Math.min(100, Math.round(Number(raw))));
+    setDraft((current) => ({ ...current, [vehicle.id]: value }));
+    if (value === Number(vehicle.satisfaction ?? 100)) return;
+    try {
+      await base44.entities.Vehicle.update(vehicle.id, { satisfaction: value });
+      onChanged?.();
+    } catch {
+      toast.error("Nie udało się zapisać zadowolenia.");
+    }
+  };
+
   const lineByVehicle = new Map();
   assignments.forEach((assignment) => {
     if (!assignment?.vehicle_id) return;
@@ -67,6 +83,34 @@ export default function VehicleList({ vehicles, lines = [], assignments = [], lo
                     <LineBadge line={lineByVehicle.get(vehicle.id)} size="sm" />
                   ) : (
                     <span className="shrink-0 text-[10.5px] text-muted-foreground">bez linii</span>
+                  )}
+                </span>
+                <span className="mt-1 flex items-center gap-1">
+                  <span
+                    className={cn(
+                      "text-[10px]",
+                      (draft[vehicle.id] ?? Number(vehicle.satisfaction ?? 100)) < 40
+                        ? "text-destructive"
+                        : "text-muted-foreground"
+                    )}
+                  >
+                    Zadowolenie
+                  </span>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    aria-label={`Zadowolenie ${vehicle.fleet_number}`}
+                    value={draft[vehicle.id] ?? Number(vehicle.satisfaction ?? 100)}
+                    onChange={(event) =>
+                      setDraft((current) => ({ ...current, [vehicle.id]: event.target.value }))
+                    }
+                    onBlur={(event) => saveSatisfaction(vehicle, event.target.value)}
+                    className="h-6 w-12 rounded border border-border bg-card px-1 text-[10.5px] text-foreground"
+                  />
+                  <span className="text-[10px] text-muted-foreground">%</span>
+                  {(draft[vehicle.id] ?? Number(vehicle.satisfaction ?? 100)) < 40 && (
+                    <span className="text-[10px] font-semibold text-destructive">może uciec</span>
                   )}
                 </span>
               </span>
