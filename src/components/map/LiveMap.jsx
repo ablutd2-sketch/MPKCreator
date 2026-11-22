@@ -6,6 +6,7 @@ import BaseTileLayer from "@/components/map/BaseTileLayer";
 import MapSearch from "@/components/map/MapSearch";
 import VehiclePopup from "@/components/map/VehiclePopup";
 import { POLAND_CENTER, POLAND_ZOOM } from "@/lib/mapConfig";
+import { TRAM_COLOR, trackPositions } from "@/lib/track";
 
 function MapFocus({ target }) {
   const map = useMap();
@@ -93,25 +94,29 @@ export default function LiveMap({ items = [], focus }) {
       <MapSearch />
 
       {routes.map((line) => {
-        const color = line.color || "#14223B";
+        const tram = Boolean(line.tram);
+        const color = tram ? TRAM_COLOR : line.color || "#14223B";
         const hasTam = Array.isArray(line.path_tam) && line.path_tam.length > 1;
         const hasPowrot = Array.isArray(line.path_powrot) && line.path_powrot.length > 1;
+        const main = hasTam ? line.path_tam : line.stops.map((stop) => ({ lat: stop.lat, lng: stop.lng }));
 
         return (
           <Fragment key={line.id}>
             <Polyline
-              positions={
-                hasTam ? line.path_tam.map((point) => [point.lat, point.lng]) : line.stops.map((stop) => [stop.lat, stop.lng])
+              positions={trackPositions(main, tram)}
+              pathOptions={
+                tram
+                  ? { color, weight: 3, opacity: 0.9, dashArray: "10 8", lineCap: "round" }
+                  : {
+                      color,
+                      weight: hasTam ? 5 : 4,
+                      opacity: hasTam ? 0.6 : 0.4,
+                      lineCap: "round",
+                      dashArray: hasTam ? undefined : "6 8",
+                    }
               }
-              pathOptions={{
-                color,
-                weight: hasTam ? 5 : 4,
-                opacity: hasTam ? 0.6 : 0.4,
-                lineCap: "round",
-                dashArray: hasTam ? undefined : "6 8",
-              }}
             />
-            {hasPowrot && (
+            {hasPowrot && !tram && (
               <Polyline
                 positions={line.path_powrot.map((point) => [point.lat, point.lng])}
                 pathOptions={{ color, weight: 3, opacity: 0.32, dashArray: "2 7", lineCap: "round" }}
