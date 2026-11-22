@@ -6,7 +6,7 @@ import LineBadge from "@/components/LineBadge";
 import StopRow from "@/components/builder/StopRow";
 import AssignmentModeEditor from "@/components/builder/AssignmentModeEditor";
 import { autoLineName, isNightNumber } from "@/lib/lineUtils";
-import { fetchRoadPath, pathDistanceKm } from "@/lib/routing";
+import { fetchRoadPath, pathDistanceKm, splitPathAt } from "@/lib/routing";
 import { parseStopsFile } from "@/lib/stopsImport";
 import { cn } from "@/lib/utils";
 
@@ -175,12 +175,54 @@ export default function StopsEditor({ draft, onChange, onSave, saving, vehicles 
 
         const terminus = tamBase[tamBase.length - 1];
         const circuit = tamBase.length >= 3 && pathDistanceKm([tamBase[0], terminus]) < 0.2;
-        // Punkty pętli prowadzą autobus do przystanku końcowego w prawidłowym kierunku...
-        const tamPoints = viaPoints.length ? [...tamBase.slice(0, -1), ...viaPoints, terminus] : tamBase;
-        // ...a w drodze powrotnej autobus opuszcza pętlę dalej w tym samym kierunku.
-        const backPoints = viaPoints.length && !circuit ? [backBase[0], ...viaPoints, ...backBase.slice(1)] : backBase;
-        const tam = await fetchRoadPath(tamPoints);
-        const powrot = circuit ? tam : await fetchRoadPath(backPoints);
+        // Punkty pętli trafiają do przystanku, przy którym leżą — pętla w środku trasy
+        // jest objechana na miejscu, a nie dopiero pod koniec kursu.
+        const clusters = [];
+        viaPoints.forEach((point) => {
+          const cluster = clusters.find((item) => pathDistanceKm([point, item[item.length - 1]]) < 0.15);
+          if (cluster) cluster.push(point);
+          else clusters.push([point]);
+        });
+        const loopByStop = new Map();
+        clusters.forEach((cluster) => {
+          const anchor = cluster[cluster.length - 1];
+          let index = 0;
+          let best = Infinity;
+          tamBase.forEach((stop, i) => {
+            const distance = pathDistanceKm([anchor, stop]);
+            if (distance < best) {
+              best = distance;
+              index = i;
+            }
+          });
+          if (circuit && index === 0) index = tamBase.length - 1;
+          loopByStop.set(index, [...(loopByStop.get(index) || []), ...cluster]);
+        });
+        const tamPoints = [];
+        tamBase.forEach((stop, index) => {
+          const loop = loopByStop.get(index);
+          if (loop) tamPoints.push(...loop);
+          tamPoints.push(stop);
+        });
+
+        // Cały kurs wyznaczamy jednym przejazdem bez zawracania na pętli, żeby autobus
+        // wjeżdżał i zjeżdżał z pętli w tym samym kierunku, a nie pod prąd.
+        let tam;
+        let powrot;
+        if (circuit) {
+          tam = await fetchRoadPath(tamPoints);
+          powrot = tam;
+        } else {
+          const cycle = await fetchRoadPath([...tamPoints, ...backBase.slice(1)], { continueStraight: true });
+          const split = splitPathAt(cycle, terminus);
+          if (split) {
+            tam = split.before;
+            powrot = split.after;
+          } else {
+            tam = await fetchRoadPath(tamPoints);
+            powrot = await fetchRoadPath(backBase);
+          }
+        }
         if (cancelled) return;
         lastSignature.current = signature;
         setRouting(false);
