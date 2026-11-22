@@ -1,0 +1,298 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 20% 97%;
+    --foreground: 215 28% 13%;
+    --card: 0 0% 100%;
+    --card-foreground: 215 28% 13%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 28% 13%;
+    --primary: 215 40% 16%;
+    --primary-foreground: 210 30% 98%;
+    --secondary: 210 16% 93%;
+    --secondary-foreground: 215 28% 13%;
+    --muted: 210 16% 93%;
+    --muted-foreground: 215 12% 40%;
+    --accent: 38 92% 48%;
+    --accent-foreground: 215 40% 10%;
+    --destructive: 0 72% 47%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 212 16% 86%;
+    --input: 212 16% 86%;
+    --ring: 215 40% 16%;
+    --chart-1: 0 72% 47%;
+    --chart-2: 215 40% 24%;
+    --chart-3: 38 92% 48%;
+    --chart-4: 168 44% 36%;
+    --chart-5: 268 32% 50%;
+    --radius: 0.5rem;
+    --font-display: "Inter Tight", ui-sans-serif, system-ui, sans-serif;
+    --font-heading: "Inter Tight", ui-sans-serif, system-ui, sans-serif;
+    --font-font: "Inter Tight", ui-sans-serif, system-ui, sans-serif;
+    --font-body: "Inter Tight", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    --sidebar-background: 210 20% 98%;
+    --sidebar-foreground: 215 16% 26%;
+    --sidebar-primary: 215 40% 16%;
+    --sidebar-primary-foreground: 210 30% 98%;
+    --sidebar-accent: 210 16% 94%;
+    --sidebar-accent-foreground: 215 28% 13%;
+    --sidebar-border: 212 16% 86%;
+    --sidebar-ring: 215 40% 16%;
+  }
+
+  .dark {
+    --background: 222 28% 8%;
+    --foreground: 40 30% 96%;
+    --card: 220 26% 11%;
+    --card-foreground: 40 30% 96%;
+    --popover: 220 26% 12%;
+    --popover-foreground: 40 30% 96%;
+    --primary: 36 82% 52%;
+    --primary-foreground: 220 40% 10%;
+    --secondary: 220 20% 18%;
+    --secondary-foreground: 40 30% 96%;
+    --muted: 220 18% 18%;
+    --muted-foreground: 220 10% 65%;
+    --accent: 36 82% 52%;
+    --accent-foreground: 220 40% 10%;
+    --destructive: 358 62% 52%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 16% 22%;
+    --input: 220 16% 22%;
+    --ring: 36 82% 52%;
+    --chart-1: 36 82% 52%;
+    --chart-2: 200 60% 55%;
+    --chart-3: 358 62% 58%;
+    --chart-4: 168 44% 47%;
+    --chart-5: 268 40% 62%;
+  }
+
+  :root {
+    --font-display: "Inter Tight", ui-sans-serif, system-ui, sans-serif;
+    --font-heading: "Inter Tight", ui-sans-serif, system-ui, sans-serif;
+    --font-body: "Inter Tight", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body;
+    font-feature-settings: "ss01" on, "cv01" on;
+  }
+
+  ::selection {
+    background: hsl(var(--accent) / 0.28);
+  }
+}
+
+@layer components {
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: hsl(var(--muted-foreground));
+  }
+
+  .surface {
+    @apply rounded-xl border border-border bg-card shadow-[0_1px_2px_rgba(15,23,42,0.05)];
+  }
+
+  .num {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@keyframes riseIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rise-in {
+  animation: riseIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ---------- Leaflet ---------- */
+.leaflet-container {
+  font-family: var(--font-body);
+  background: #e7ebef;
+  z-index: 0;
+}
+
+.leaflet-tile-pane {
+  filter: saturate(0.82) contrast(0.98) brightness(1.03);
+}
+
+.leaflet-control-attribution {
+  background: rgba(255, 255, 255, 0.78) !important;
+  font-size: 9px !important;
+  padding: 2px 7px !important;
+  border-radius: 8px 0 0 0;
+  color: #47505f !important;
+}
+
+.leaflet-control-attribution a {
+  color: #47505f !important;
+}
+
+.leaflet-bar {
+  border: 0 !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+  box-shadow: 0 14px 30px -18px rgba(18, 26, 43, 0.7) !important;
+}
+
+.leaflet-bar a {
+  background: rgba(255, 255, 255, 0.95) !important;
+  color: #14223b !important;
+  border-bottom-color: rgba(18, 26, 43, 0.08) !important;
+  width: 32px !important;
+  height: 32px !important;
+  line-height: 32px !important;
+  font-size: 18px !important;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 10px;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 28px 60px -26px rgba(18, 26, 43, 0.6), 0 0 0 1px rgba(18, 26, 43, 0.07);
+}
+
+.leaflet-popup-content {
+  margin: 0 !important;
+  width: auto !important;
+}
+
+.leaflet-popup-tip {
+  box-shadow: none;
+}
+
+.leaflet-popup-close-button {
+  display: none !important;
+}
+
+/* ---------- Vehicle marker ---------- */
+.bus-marker-root {
+  background: transparent;
+  border: 0;
+  transition: transform 0.18s linear;
+}
+
+.leaflet-zoom-anim .bus-marker-root {
+  transition: none;
+}
+
+.bus-marker-shell {
+  position: relative;
+  width: 46px;
+  height: 46px;
+}
+
+.bus-marker {
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  border: 2px solid #fff;
+  box-shadow: 0 12px 24px -10px rgba(18, 26, 43, 0.75), 0 0 0 1px rgba(18, 26, 43, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bus-marker__img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  background: #fff;
+}
+
+.bus-marker__fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(150deg, #22375c, #0d1728);
+}
+
+.bus-marker__line {
+  position: absolute;
+  top: -7px;
+  right: -10px;
+  min-width: 22px;
+  padding: 2px 4px;
+  border-radius: 3px;
+  border: 1px solid #000;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.15;
+  text-align: center;
+  box-shadow: 0 3px 8px rgba(18, 26, 43, 0.3);
+}
+
+/* ---------- Stop pin ---------- */
+.stop-pin-root {
+  background: transparent;
+  border: 0;
+}
+
+.stop-pin {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: hsl(var(--primary));
+  color: #fff;
+  border: 2px solid #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  box-shadow: 0 8px 18px -8px rgba(18, 26, 43, 0.8);
+}
+
+.stop-pin--ghost {
+  background: #ffffff;
+  color: #000000;
+  border: 2px dashed #000000;
+  font-size: 9px;
+}
+
+.stop-pin--start {
+  background: #0f7a5a;
+}
+
+.stop-pin--end {
+  background: #14223b;
+}
