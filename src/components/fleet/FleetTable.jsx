@@ -62,6 +62,7 @@ export default function FleetTable({
               <Th className="w-[96px]">Rysunek</Th>
               <Th>ID / Numer taborowy</Th>
               <Th>Model</Th>
+              <Th className="w-[90px]">Zadowolenie</Th>
               <Th className="w-[74px]">Linia</Th>
               <Th>Kierunek</Th>
               <Th>Ostatnia aktywność</Th>
@@ -116,6 +117,22 @@ export default function FleetTable({
                   </Td>
 
                   <Td className="text-[13px] text-foreground">{row.vehicle.model || "—"}</Td>
+
+                  <Td>
+                    {(() => {
+                      const satisfaction = Number(row.vehicle.satisfaction ?? 100);
+                      return (
+                        <span
+                          className={cn(
+                            "num text-[12px] font-semibold",
+                            satisfaction < 40 ? "text-destructive" : "text-foreground"
+                          )}
+                        >
+                          {satisfaction}%
+                        </span>
+                      );
+                    })()}
+                  </Td>
 
                   <Td>
                     {row.state && row.line ? (
