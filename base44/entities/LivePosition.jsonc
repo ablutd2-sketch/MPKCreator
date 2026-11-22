@@ -1,0 +1,65 @@
+{
+  "name": "LivePosition",
+  "type": "object",
+  "properties": {
+    "fleet_number": {
+      "type": "string",
+      "description": "Numer taborowy pojazdu nadaj\u0105cego pozycj\u0119"
+    },
+    "lat": {
+      "type": "number",
+      "description": "Szeroko\u015b\u0107 geograficzna"
+    },
+    "lng": {
+      "type": "number",
+      "description": "D\u0142ugo\u015b\u0107 geograficzna"
+    },
+    "line": {
+      "type": "string",
+      "description": "Numer linii"
+    },
+    "direction": {
+      "type": "string",
+      "description": "Kierunek kursu"
+    },
+    "next_stop": {
+      "type": "string",
+      "description": "Nast\u0119pny przystanek"
+    },
+    "next_departure": {
+      "type": "string",
+      "description": "Godzina kolejnego odjazdu HH:MM"
+    },
+    "heading": {
+      "type": "number",
+      "description": "Azymut ruchu w stopniach"
+    },
+    "source": {
+      "type": "string",
+      "description": "\u0179r\u00f3d\u0142o danych, np. webhook"
+    }
+  },
+  "required": [
+    "fleet_number",
+    "lat",
+    "lng"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
