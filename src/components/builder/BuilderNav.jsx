@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 const TABS = [
   { to: "/builder", label: "Pojazdy", exact: true },
   { to: "/builder/trasy", label: "Trasy i przystanki" },
+  { to: "/builder/tory", label: "Tory" },
   { to: "/builder/kursy", label: "Kursy i rozkład" },
 ];
 
