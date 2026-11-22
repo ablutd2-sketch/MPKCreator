@@ -175,8 +175,12 @@ export default function StopsEditor({ draft, onChange, onSave, saving, vehicles 
 
         const terminus = tamBase[tamBase.length - 1];
         const circuit = tamBase.length >= 3 && pathDistanceKm([tamBase[0], terminus]) < 0.2;
-        const tam = await fetchRoadPath(viaPoints.length ? [...tamBase, ...viaPoints, terminus] : tamBase);
-        const powrot = circuit ? tam : await fetchRoadPath(backBase);
+        // Punkty pętli prowadzą autobus do przystanku końcowego w prawidłowym kierunku...
+        const tamPoints = viaPoints.length ? [...tamBase.slice(0, -1), ...viaPoints, terminus] : tamBase;
+        // ...a w drodze powrotnej autobus opuszcza pętlę dalej w tym samym kierunku.
+        const backPoints = viaPoints.length && !circuit ? [backBase[0], ...viaPoints, ...backBase.slice(1)] : backBase;
+        const tam = await fetchRoadPath(tamPoints);
+        const powrot = circuit ? tam : await fetchRoadPath(backPoints);
         if (cancelled) return;
         lastSignature.current = signature;
         setRouting(false);
