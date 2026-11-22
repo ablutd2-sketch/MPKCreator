@@ -1,10 +1,13 @@
 import { ClientOnly, Link, createFileRoute } from "@tanstack/react-router";
 import { Suspense, lazy, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
+import { toast } from "sonner";
 import MapControls from "@/components/map/MapControls";
 import ActiveVehiclesPanel from "@/components/map/ActiveVehiclesPanel";
+import OffRouteAlarm from "@/components/map/OffRouteAlarm";
 import { useSimulation } from "@/lib/SimulationContext";
 import { buildLiveItems } from "@/lib/livePositions";
+import { detectOffRoute } from "@/lib/offRoute";
 import { computeFleetState, departuresFor, nextDepartureAcross } from "@/lib/simulation";
 import { useLivePositions, useTransitData } from "@/lib/useTransitData";
 
@@ -70,6 +73,28 @@ function LiveMapPage() {
     [fleet, sim.dayKey]
   );
   const shown = sim.mode === "live" ? liveItems : active;
+  const offRoute = useMemo(() => detectOffRoute(shown), [shown]);
+  const alarmedRef = useRef(new Set());
+
+  useEffect(() => {
+    offRoute.forEach((alert) => {
+      if (alarmedRef.current.has(alert.vehicle.id)) return;
+      alarmedRef.current.add(alert.vehicle.id);
+      toast.error(
+        `Alarm: ${alert.vehicle.fleet_number} (linia ${alert.line?.number || "?"}) zjechał z trasy`,
+        {
+          description:
+            alert.distanceM >= 1000
+              ? `${(alert.distanceM / 1000).toFixed(0)} km od trasy`
+              : `${Math.round(alert.distanceM)} m od trasy`,
+          duration: 8000,
+        }
+      );
+    });
+    [...alarmedRef.current].forEach((id) => {
+      if (!offRoute.some((alert) => alert.vehicle.id === id)) alarmedRef.current.delete(id);
+    });
+  }, [offRoute]);
 
   useEffect(() => {
     if (!focusId || focusedRef.current === focusId) return;
@@ -105,6 +130,8 @@ function LiveMapPage() {
         liveCount={liveItems.length}
         dayHasCourses={dayHasCourses}
       />
+
+      <OffRouteAlarm alerts={offRoute} onShow={(alert) => setFocus({ lat: alert.lat, lng: alert.lng })} />
 
       {shown.length > 0 && (
         <ActiveVehiclesPanel items={shown} onSelect={(item) => setFocus({ lat: item.state.lat, lng: item.state.lng })} />
