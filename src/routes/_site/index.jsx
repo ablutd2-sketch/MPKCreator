@@ -7,6 +7,7 @@ import ActiveVehiclesPanel from "@/components/map/ActiveVehiclesPanel";
 import OffRouteAlarm from "@/components/map/OffRouteAlarm";
 import { useSimulation } from "@/lib/SimulationContext";
 import { buildLiveItems } from "@/lib/livePositions";
+import { applyEscapes } from "@/lib/escape";
 import { detectOffRoute } from "@/lib/offRoute";
 import { computeFleetState, departuresFor, nextDepartureAcross } from "@/lib/simulation";
 import { useLivePositions, useTransitData } from "@/lib/useTransitData";
@@ -72,7 +73,11 @@ function LiveMapPage() {
     () => fleet.some((item) => departuresFor(item.assignment, sim.dayKey).length > 0),
     [fleet, sim.dayKey]
   );
-  const shown = sim.mode === "live" ? liveItems : active;
+  const simulated = useMemo(
+    () => applyEscapes(active, { simMinutes: sim.simMinutes }),
+    [active, sim.simMinutes]
+  );
+  const shown = sim.mode === "live" ? liveItems : simulated;
   const offRoute = useMemo(() => detectOffRoute(shown), [shown]);
   const alarmedRef = useRef(new Set());
 
@@ -131,7 +136,7 @@ function LiveMapPage() {
         dayHasCourses={dayHasCourses}
       />
 
-      <OffRouteAlarm alerts={offRoute} onShow={(alert) => setFocus({ lat: alert.lat, lng: alert.lng })} />
+      <OffRouteAlarm alerts={offRoute} />
 
       {shown.length > 0 && (
         <ActiveVehiclesPanel items={shown} onSelect={(item) => setFocus({ lat: item.state.lat, lng: item.state.lng })} />
