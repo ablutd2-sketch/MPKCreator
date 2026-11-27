@@ -1,10 +1,12 @@
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
+import { base44 } from "@/api/base44Client";
 import FleetFilters from "@/components/fleet/FleetFilters";
 import FleetTable from "@/components/fleet/FleetTable";
 import { useSimulation } from "@/lib/SimulationContext";
 import { computeFleetState, lastActivity, nextDepartureAcross } from "@/lib/simulation";
+import { wakeFatigueValue } from "@/lib/fatigue";
 import { useTransitData } from "@/lib/useTransitData";
 
 export const Route = createFileRoute("/_site/fleet")({
@@ -23,7 +25,7 @@ export const Route = createFileRoute("/_site/fleet")({
 const FAVORITES_KEY = "krakbus-favorites";
 
 function FleetPage() {
-  const { vehicles, lines, assignments, loading } = useTransitData();
+  const { vehicles, lines, assignments, loading, reload } = useTransitData();
   const sim = useSimulation();
   const navigate = useNavigate();
 
@@ -113,6 +115,21 @@ function FleetPage() {
     navigate({ to: "/", search: { vehicle: row.vehicle.id } });
   };
 
+  // Budzimy wóz z zajezdni — wraca do kursu ze zmęczeniem odpowiednim do godziny.
+  const wakeVehicle = async (row) => {
+    await base44.entities.Vehicle.update(row.vehicle.id, {
+      depot_sleep: false,
+      fatigue: wakeFatigueValue(row.vehicle, sim.simMinutes),
+    });
+    await reload();
+  };
+
+  // Usypiamy wóz w zajezdni — staje na pętli startowej i odpoczywa.
+  const sleepVehicle = async (row) => {
+    await base44.entities.Vehicle.update(row.vehicle.id, { depot_sleep: true, fatigue: 0 });
+    await reload();
+  };
+
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:py-12">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
@@ -158,6 +175,8 @@ function FleetPage() {
           onToggleFavorite={toggleFavorite}
           onOpenVehicle={openVehicle}
           onQuickStart={quickStart}
+          onWakeVehicle={wakeVehicle}
+          onSleepVehicle={sleepVehicle}
           secondsAgo={secondsAgo}
           dayKey={sim.dayKey}
         />
