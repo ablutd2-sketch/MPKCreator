@@ -3,7 +3,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import FleetFilters from "@/components/fleet/FleetFilters";
 import FleetTable from "@/components/fleet/FleetTable";
-import LinesVehiclesGrid from "@/components/fleet/LinesVehiclesGrid";
 import { useSimulation } from "@/lib/SimulationContext";
 import { computeFleetState, lastActivity, nextDepartureAcross } from "@/lib/simulation";
 import { useTransitData } from "@/lib/useTransitData";
@@ -124,12 +123,20 @@ function FleetPage() {
             Cała flota w jednym miejscu. Kliknij brygadę, aby przejść na mapę i wycentrować widok na pojeździe.
           </p>
         </div>
-        <Link
-          to="/builder"
-          className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-4 py-2 text-[12px] font-semibold text-foreground transition-colors hover:border-primary"
-        >
-          Zarządzaj taborem <ArrowUpRight className="h-3.5 w-3.5" />
-        </Link>
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            to="/linie"
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-4 py-2 text-[12px] font-semibold text-foreground transition-colors hover:border-primary"
+          >
+            Pojazdy na liniach <ArrowUpRight className="h-3.5 w-3.5" />
+          </Link>
+          <Link
+            to="/builder"
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-4 py-2 text-[12px] font-semibold text-foreground transition-colors hover:border-primary"
+          >
+            Zarządzaj taborem <ArrowUpRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
       </div>
 
       <FleetFilters
@@ -141,14 +148,6 @@ function FleetPage() {
         onToggleFavorites={() => setOnlyFavorites((value) => !value)}
         activeCount={activeCount}
       />
-
-      {loading ? (
-        <div className="surface h-64 animate-pulse" />
-      ) : (
-        <div className="mb-4">
-          <LinesVehiclesGrid vehicles={vehicles} lines={lines} assignments={assignments} />
-        </div>
-      )}
 
       {loading ? (
         <div className="surface h-64 animate-pulse" />
