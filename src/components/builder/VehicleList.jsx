@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { base44 } from "@/api/base44Client";
 import { Image } from "@/components/ui/image";
 import LineBadge from "@/components/LineBadge";
+import { FLOOR_OPTIONS, KIND_OPTIONS } from "@/lib/vehicleFloor";
 import { cn } from "@/lib/utils";
 
 export default function VehicleList({ vehicles, lines = [], assignments = [], loading, onChanged }) {
@@ -18,6 +19,15 @@ export default function VehicleList({ vehicles, lines = [], assignments = [], lo
       onChanged?.();
     } catch {
       toast.error("Nie udało się zapisać zadowolenia.");
+    }
+  };
+
+  const saveField = async (vehicle, patch) => {
+    try {
+      await base44.entities.Vehicle.update(vehicle.id, patch);
+      onChanged?.();
+    } catch {
+      toast.error("Nie udało się zapisać pojazdu.");
     }
   };
 
@@ -112,6 +122,32 @@ export default function VehicleList({ vehicles, lines = [], assignments = [], lo
                   {(draft[vehicle.id] ?? Number(vehicle.satisfaction ?? 100)) < 40 && (
                     <span className="text-[10px] font-semibold text-destructive">może uciec</span>
                   )}
+                </span>
+                <span className="mt-1 flex items-center gap-1">
+                  <select
+                    value={vehicle.kind || "bus"}
+                    onChange={(event) => saveField(vehicle, { kind: event.target.value })}
+                    aria-label={`Rodzaj pojazdu ${vehicle.fleet_number}`}
+                    className="h-6 rounded border border-border bg-card px-1 text-[10px] font-medium text-foreground"
+                  >
+                    {KIND_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    value={vehicle.floor || "unknown"}
+                    onChange={(event) => saveField(vehicle, { floor: event.target.value })}
+                    aria-label={`Typ podłogi ${vehicle.fleet_number}`}
+                    className="h-6 min-w-0 flex-1 rounded border border-border bg-card px-1 text-[10px] font-medium text-foreground"
+                  >
+                    {FLOOR_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
                 </span>
               </span>
               <button
