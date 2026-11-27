@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import LineBadge from "@/components/LineBadge";
 import StopRow from "@/components/builder/StopRow";
 import AssignmentModeEditor from "@/components/builder/AssignmentModeEditor";
-import { autoLineName, isNightNumber } from "@/lib/lineUtils";
+import { autoLineName } from "@/lib/lineUtils";
 import { fetchRoadPath, pathDistanceKm, splitPathAt } from "@/lib/routing";
 import { parseStopsFile } from "@/lib/stopsImport";
 import { cn } from "@/lib/utils";
@@ -141,6 +141,13 @@ export default function StopsEditor({ draft, onChange, onSave, saving, vehicles 
 
   useEffect(() => {
     const current = draftRef.current;
+    // Tramwaj nie jeździ po drogach — tor rysuje się w zakładce Tory, więc
+    // nie nadpisujemy go automatycznym prowadzeniem po ulicach.
+    if (current.tram) {
+      setRouting(false);
+      setRouteError("");
+      return undefined;
+    }
     const list = Array.isArray(current.stops) ? current.stops : [];
     const hasPaths = (current.path_tam || []).length > 1 && (current.path_powrot || []).length > 1;
 
@@ -240,11 +247,13 @@ export default function StopsEditor({ draft, onChange, onSave, saving, vehicles 
     };
   }, [signature, attempt]);
 
-  const hasRoute = (draft.path_tam || []).length > 1 && (draft.path_powrot || []).length > 1;
-  const needsRoute = stops.length >= 2;
+  const tram = Boolean(draft.tram);
+  const hasTrack = (draft.path_tam || []).length > 1;
+  const hasRoute = tram ? hasTrack : hasTrack && (draft.path_powrot || []).length > 1;
+  const needsRoute = stops.length >= 2 && !tram;
   const routeKm = hasRoute ? pathDistanceKm(draft.path_tam) : 0;
   const direction = autoLineName(stops);
-  const night = Boolean(draft.night) || isNightNumber(draft.number);
+  const night = Boolean(draft.night);
 
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
@@ -442,7 +451,15 @@ export default function StopsEditor({ draft, onChange, onSave, saving, vehicles 
           </div>
         </div>
 
-        {needsRoute && (
+        {tram ? (
+          <div className="flex items-start gap-1.5 rounded-xl border border-border bg-secondary/40 px-3 py-2 text-[10.5px] leading-snug text-muted-foreground">
+            <span className="flex-1">
+              {hasTrack
+                ? `Tor gotowy · ${routeKm.toFixed(1)} km · ${(draft.path_tam || []).length} punktów`
+                : "Tor rysujesz w zakładce Tory — linia nie jest prowadzona po drogach."}
+            </span>
+          </div>
+        ) : needsRoute ? (
           <div
             className={cn(
               "flex items-start gap-1.5 rounded-xl border px-3 py-2 text-[10.5px] leading-snug",
@@ -471,7 +488,7 @@ export default function StopsEditor({ draft, onChange, onSave, saving, vehicles 
               </button>
             )}
           </div>
-        )}
+        ) : null}
 
         {error && <p className="text-[11px] font-medium text-destructive">{error}</p>}
 
