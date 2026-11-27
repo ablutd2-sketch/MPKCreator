@@ -76,11 +76,11 @@ export default function VehicleInfoDialog({ item, onClose }) {
             <div className="flex gap-2 border-t border-border pt-3">
               <Button size="sm" variant="outline" className="flex-1" onClick={() => act("feed")} disabled={Boolean(busy)}>
                 {busy === "feed" ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <Apple className="mr-1.5 h-3.5 w-3.5" />}
-                Uzupełnij karmę
+                Nakarm
               </Button>
               <Button size="sm" variant="outline" className="flex-1" onClick={() => act("drink")} disabled={Boolean(busy)}>
                 {busy === "drink" ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <Droplets className="mr-1.5 h-3.5 w-3.5" />}
-                Podaj napój
+                Napój
               </Button>
             </div>
           </div>
