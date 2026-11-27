@@ -4,11 +4,13 @@ import { toast } from "sonner";
 import { base44 } from "@/api/base44Client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { FLOOR_OPTIONS } from "@/lib/vehicleFloor";
 import { cn } from "@/lib/utils";
 
 export default function VehicleForm({ onSaved }) {
   const [fleetNumber, setFleetNumber] = useState("");
   const [kind, setKind] = useState("bus");
+  const [floor, setFloor] = useState("unknown");
   const [model, setModel] = useState("");
   const [satisfaction, setSatisfaction] = useState(100);
   const [file, setFile] = useState(null);
@@ -32,6 +34,7 @@ export default function VehicleForm({ onSaved }) {
   const reset = () => {
     setFleetNumber("");
     setKind("bus");
+    setFloor("unknown");
     setModel("");
     setSatisfaction(100);
     setFile(null);
@@ -58,6 +61,7 @@ export default function VehicleForm({ onSaved }) {
       await base44.entities.Vehicle.create({
         fleet_number: number,
         kind,
+        floor,
         model: model.trim(),
         image_url: imageUrl,
         satisfaction,
@@ -96,6 +100,24 @@ export default function VehicleForm({ onSaved }) {
             {option.label}
           </button>
         ))}
+      </div>
+
+      <div className="mt-3">
+        <Label htmlFor="floor" className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
+          Typ podłogi
+        </Label>
+        <select
+          id="floor"
+          value={floor}
+          onChange={(event) => setFloor(event.target.value)}
+          className="mt-1 h-9 w-full rounded-lg border border-border bg-card px-2 text-[12px] font-medium text-foreground outline-none focus:border-primary"
+        >
+          {FLOOR_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="mt-4 space-y-3">
