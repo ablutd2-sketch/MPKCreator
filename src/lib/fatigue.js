@@ -28,6 +28,16 @@ export function isSleeping(vehicle, simMinutes) {
   return effectiveFatigue(vehicle, simMinutes) >= FATIGUE_LIMIT;
 }
 
+/**
+ * Wartość bazowa zmęczenia, przy której pojazd obudzony o danej godzinie
+ * symulacji startuje od 0% i dopiero potem znowu się męczy.
+ */
+export function wakeFatigueValue(vehicle, simMinutes) {
+  const minutes = ((Number(simMinutes || 0) % 1440) + 1440) % 1440;
+  const accrued = (minutes / 60) * FATIGUE_PER_HOUR + offsetFor(vehicle?.id) * 12;
+  return -Math.round(accrued * 10) / 10;
+}
+
 export const SATISFACTION_PER_HOUR = 1.2;
 
 /** Zadowolenie spada samo z każdą godziną dnia; w zajezdni pojazd odpoczywa i wraca do 100%. */
