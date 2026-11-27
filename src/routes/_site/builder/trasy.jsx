@@ -5,7 +5,7 @@ import { base44 } from "@/api/base44Client";
 import EditorGate from "@/components/builder/EditorGate";
 import LinesPanel from "@/components/builder/LinesPanel";
 import StopsEditor from "@/components/builder/StopsEditor";
-import { autoLineName, isNightNumber } from "@/lib/lineUtils";
+import { autoLineName } from "@/lib/lineUtils";
 import { useTransitData } from "@/lib/useTransitData";
 
 export const Route = createFileRoute("/_site/builder/trasy")({
@@ -20,7 +20,7 @@ function toDraft(line) {
     number: line.number || "",
     name: line.name || "",
     color: line.color || "#C8102E",
-    night: Boolean(line.night) || isNightNumber(line.number),
+    night: Boolean(line.night),
     tram: Boolean(line.tram),
     stops: Array.isArray(line.stops) ? line.stops.map((stop) => ({ ...stop })) : [],
     path_tam: Array.isArray(line.path_tam) ? line.path_tam : [],
@@ -61,7 +61,7 @@ function RoutesPage() {
         number,
         color,
         stops: [],
-        night: isNightNumber(number),
+        night: false,
         assignment_mode: "manual",
         model_filter: "",
         model_mix: [],
