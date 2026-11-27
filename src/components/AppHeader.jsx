@@ -5,6 +5,7 @@ import { useAuth } from "@/lib/AuthContext";
 const NAV = [
   { to: "/", label: "Mapa na żywo", exact: true },
   { to: "/fleet", label: "Tabor / Pojazdy" },
+  { to: "/linie", label: "Pojazdy na liniach" },
   { to: "/builder", label: "Kreator tras" },
   { to: "/rozklad", label: "Rozkład jazdy" },
 ];
