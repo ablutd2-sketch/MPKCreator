@@ -1,10 +1,6 @@
-export function isNightNumber(number) {
-  return /^[69]/.test(String(number || "").trim());
-}
-
 export function isNightLine(line) {
   if (!line) return false;
-  return Boolean(line.night) || isNightNumber(line.number);
+  return Boolean(line.night);
 }
 
 export function autoLineName(stops) {
@@ -18,8 +14,15 @@ export function autoLineName(stops) {
 
   // Linia okrężna: kierunek to start i najdalszy punkt trasy, nie powtórzony start.
   if (list.length > 2 && span(first, last) < 0.002) {
-    const turnaround = list.slice(0, -1).reduce((best, stop) => (span(first, stop) > span(first, best) ? stop : best), first);
-    return `${String(first.name).trim()} → ${String(turnaround.name).trim()}`;
+    const names = list.map((stop) => String(stop.name).trim());
+    let turnaround = last;
+    for (let i = 1; i < names.length; i += 1) {
+      if (names.slice(0, i).includes(names[i])) {
+        turnaround = list[i - 1];
+        break;
+      }
+    }
+    return `${names[0]} → ${String(turnaround.name).trim()}`;
   }
 
   return `${String(first.name).trim()} → ${String(last.name).trim()}`;
