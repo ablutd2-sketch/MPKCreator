@@ -1,4 +1,10 @@
-import { effectiveFatigue, effectiveSatisfaction, isSleeping } from "@/lib/fatigue";
+import {
+  effectiveFatigue,
+  effectiveHunger,
+  effectiveSatisfaction,
+  effectiveThirst,
+  isSleeping,
+} from "@/lib/fatigue";
 
 export const BUS_SPEED_KMH = 24;
 export const DWELL_SEC = 30;
@@ -553,6 +559,8 @@ export function computeFleetState({ vehicles, lines, assignments, simMinutes, da
     state,
     fatigue: effectiveFatigue(vehicle, simMinutes),
     satisfaction: effectiveSatisfaction(vehicle, simMinutes),
+    hunger: effectiveHunger(vehicle, simMinutes),
+    thirst: effectiveThirst(vehicle, simMinutes),
     sleeping: Boolean(sleeping),
   }));
 }
