@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import LineBadge from "@/components/LineBadge";
-import { ASSIGNMENT_MODE_LABELS, isNightNumber } from "@/lib/lineUtils";
+import { ASSIGNMENT_MODE_LABELS } from "@/lib/lineUtils";
 import { cn } from "@/lib/utils";
 
 export default function LinesPanel({ lines, selectedId, onSelect, onCreate, onDelete }) {
@@ -72,7 +72,7 @@ export default function LinesPanel({ lines, selectedId, onSelect, onCreate, onDe
                     <span className="block truncate text-[10px] text-muted-foreground">
                       {(line.stops || []).length} przystanków ·{" "}
                       {ASSIGNMENT_MODE_LABELS[line.assignment_mode || "manual"]}
-                      {isNightNumber(line.number) || line.night ? " · nocna" : ""}
+                      {line.night ? " · nocna" : ""}
                     </span>
                   </span>
                 </button>
