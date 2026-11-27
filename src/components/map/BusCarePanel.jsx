@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Apple, Bed, Droplets, Loader2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
-import { FATIGUE_LIMIT, wakeFatigueValue } from "@/lib/fatigue";
+import StatBar from "@/components/fleet/StatBar";
+import { FATIGUE_LIMIT, wakeFatigueValue, wakeHungerValue, wakeThirstValue } from "@/lib/fatigue";
 import { useSimulation } from "@/lib/SimulationContext";
 import { useTransitData } from "@/lib/useTransitData";
 import { cn } from "@/lib/utils";
@@ -49,7 +50,10 @@ export default function BusCarePanel({ items = [] }) {
     try {
       const base = Number(current.satisfaction ?? current.vehicle.satisfaction ?? 100);
       const next = Math.min(100, Math.round((base + gain) * 10) / 10);
-      await base44.entities.Vehicle.update(current.vehicle.id, { satisfaction: next });
+      const patch = { satisfaction: next };
+      if (kind === "feed") patch.hunger = wakeHungerValue(current.vehicle, simMinutes);
+      if (kind === "drink") patch.thirst = wakeThirstValue(current.vehicle, simMinutes);
+      await base44.entities.Vehicle.update(current.vehicle.id, patch);
       setResult({ kind, gain, max, ok: gain > 0 });
       await reload();
     } finally {
@@ -75,6 +79,8 @@ export default function BusCarePanel({ items = [] }) {
 
   const filled = result ? Math.min(100, (result.gain / result.max) * 100) : 0;
   const fatigue = Math.round(Number(current.fatigue ?? current.vehicle.fatigue ?? 0));
+  const hunger = Math.round(Number(current.hunger ?? current.vehicle.hunger ?? 0));
+  const thirst = Math.round(Number(current.thirst ?? current.vehicle.thirst ?? 0));
   const inDepot = Boolean(current.vehicle.depot_sleep);
   const asleep = inDepot || fatigue >= FATIGUE_LIMIT;
 
@@ -117,6 +123,11 @@ export default function BusCarePanel({ items = [] }) {
               style={{ width: `${Math.min(100, fatigue)}%` }}
             />
           </div>
+        </div>
+
+        <div className="space-y-1">
+          <StatBar label="Głód" value={hunger} />
+          <StatBar label="Pragnienie" value={thirst} />
         </div>
 
         <div className="flex gap-1.5">
