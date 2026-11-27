@@ -19,6 +19,23 @@
       ],
       "default": "bus"
     },
+    "floor": {
+      "type": "string",
+      "description": "Typ pod\u0142ogi: niskopod\u0142ogowy, niskowej\u015bciowy, wysokopod\u0142ogowy lub brak informacji",
+      "enum": [
+        "low",
+        "low_entry",
+        "high",
+        "unknown"
+      ],
+      "enumColors": [
+        "green",
+        "yellow",
+        "red",
+        "gray"
+      ],
+      "default": "unknown"
+    },
     "model": {
       "type": "string",
       "description": "Model pojazdu, np. Solaris Urbino 18"
@@ -35,6 +52,16 @@
     "fatigue": {
       "type": "number",
       "description": "Zm\u0119czenie pojazdu w procentach. Ro\u015bnie samo w ci\u0105gu dnia; od 80% zasypia na p\u0119tli do czasu u\u0142o\u017cenia go do spania w zajezdni.",
+      "default": 0
+    },
+    "hunger": {
+      "type": "number",
+      "description": "G\u0142\u00f3d pojazdu w procentach. Ro\u015bnie samo w ci\u0105gu dnia; karmienie zeruje g\u0142\u00f3d.",
+      "default": 0
+    },
+    "thirst": {
+      "type": "number",
+      "description": "Pragnienie pojazdu w procentach. Ro\u015bnie samo w ci\u0105gu dnia; nap\u00f3j zeruje pragnienie.",
       "default": 0
     },
     "depot_sleep": {
