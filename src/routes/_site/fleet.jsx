@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import FleetFilters from "@/components/fleet/FleetFilters";
 import FleetTable from "@/components/fleet/FleetTable";
+import LinesVehiclesGrid from "@/components/fleet/LinesVehiclesGrid";
 import { useSimulation } from "@/lib/SimulationContext";
 import { computeFleetState, lastActivity, nextDepartureAcross } from "@/lib/simulation";
 import { useTransitData } from "@/lib/useTransitData";
@@ -140,6 +141,14 @@ function FleetPage() {
         onToggleFavorites={() => setOnlyFavorites((value) => !value)}
         activeCount={activeCount}
       />
+
+      {loading ? (
+        <div className="surface h-64 animate-pulse" />
+      ) : (
+        <div className="mb-4">
+          <LinesVehiclesGrid vehicles={vehicles} lines={lines} assignments={assignments} />
+        </div>
+      )}
 
       {loading ? (
         <div className="surface h-64 animate-pulse" />
